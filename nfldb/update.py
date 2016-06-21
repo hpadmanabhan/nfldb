@@ -295,9 +295,10 @@ def games_missing(cursor):
 
 def update_game_schedules(db):
     """
-    Updates the schedule data of every game in the database.
+    Rebuilds the nflgame schedules JSON file and
+    updates the schedule data of every game in the database.
     """
-    update_nflgame_schedules()
+    update_nflgame_schedules(True)
     log('Updating all game schedules... ', end='')
     with nfldb.Tx(db) as cursor:
         lock_tables(cursor)
@@ -324,9 +325,12 @@ def update_current_week_schedule(db):
     log('done.')
 
 
-def update_nflgame_schedules():
+def update_nflgame_schedules(rebuild=False):
     log('Updating schedule JSON database...')
-    run_cmd(sys.executable, '-m', 'nflgame.update_sched')
+    if rebuild:
+        run_cmd(sys.executable, '-m', 'nflgame.update_sched', '--rebuild')
+    else:
+        run_cmd(sys.executable, '-m', 'nflgame.update_sched')
     log('done.')
 
 
